@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "vix-futures/**"
+      - "vix-futures/staging/**"
 
 jobs:
   deploy:
