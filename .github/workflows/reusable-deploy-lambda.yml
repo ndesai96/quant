@@ -13,12 +13,10 @@ on:
         type: string
       region:
         description: AWS Region
-        required: true
         type: string
         default: "us-east-1"
       python_version:
         description: Python Version
-        required: true
         type: string
         default: "3.14"
     secrets:
