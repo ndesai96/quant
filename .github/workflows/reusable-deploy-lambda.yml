@@ -1,0 +1,60 @@
+name: Reusable Deploy Lambda
+
+on:
+  workflow_call:
+    inputs:
+      lambda_name:
+        description: Lambda Name
+        required: true
+        type: string
+      lambda_path:
+        description: Lambda Path
+        required: true
+        type: string
+      region:
+        description: AWS Region
+        required: true
+        type: string
+        default: "us-east-1"
+      python_version:
+        description: Python Version
+        required: true
+        type: string
+        default: "3.14"
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+          cache: 'pip'
+      - name: Install Dependencies
+        run: |
+          cd ${{ inputs.lambda_path }}
+          python -m pip install --upgrade pip
+          pip install -t . -r requirements.txt
+      - name: Create Deployment Package
+        run: |
+          cd ${{ inputs.lambda_path }}
+          zip -r deployment_package.zip . -x "*.pyc" -x "__pycache__/*" -x ".git/*" -x "*.zip"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.region }}
+      - name: Deploy Lambda Function
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ inputs.lambda_name }} \
+            --zip-file fileb://${{ inputs.lambda_path }}/deployment_package.zip

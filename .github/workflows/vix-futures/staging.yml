@@ -1,0 +1,16 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "vix-futures/**"
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/reusable-deploy-lambda.yml
+    with:
+      lambda_name: "vix-futures-staging"
+      lambda_path: "vix-futures/staging"
+      
