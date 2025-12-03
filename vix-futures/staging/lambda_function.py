@@ -1,3 +1,4 @@
+import json
 import yfinance as yf
 
 def lambda_handler(event, context):
@@ -21,19 +22,24 @@ def lambda_handler(event, context):
     else:
         contango_signal = "RED (Deep Backwardation - Severe Stress/Panic)"
 
+    response_data = {
+        'vix': {
+            'spot': vix_spot,
+            'sma': vix_sma,
+            'diff_pct': '{:.2f}%'.format(((vix_spot - vix_sma) / vix_sma) * 100),
+            'signal': signal,
+            'vix_3m_spot': vix_3m_spot,
+            'contango_spread': '{:.2f}%'.format(contango_spread * 100),
+            'contango_signal': contango_signal
+        }
+    }
+
     return {
         'statusCode': 200,
-        'body': {
-            'vix': {
-                'spot': vix_spot,
-                'sma': vix_sma,
-                'diff_pct': '{:.2f}%'.format(((vix_spot - vix_sma) / vix_sma) * 100),
-                'signal': signal,
-                'vix_3m_spot': vix_3m_spot,
-                'contango_spread': '{:.2f}%'.format(contango_spread * 100),
-                'contango_signal': contango_signal
-            }
-        }
+        'headers': {
+            'Content-Type': 'application/json'
+        },
+        'body': json.dumps(response_data)
     }
 
 
