@@ -1,4 +1,4 @@
-name: Deploy to Staging
+name: Deploy to VIX Futures Staging
 
 on:
   push:
