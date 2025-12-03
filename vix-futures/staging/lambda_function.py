@@ -1,26 +1,29 @@
 import yfinance as yf
 
 def lambda_handler(event, context):
-    tickers = ['^VIX', '^VIX3M', '^SKEW']
-    data = yf.download(tickers, period="5d", interval="1d", progress=False, auto_adjust=True)
+    vix_spot, vix_sma = get_history('^VIX', 20)
 
-    # Forward fill to handle missing data for some tickers on the last day
-    closes = data['Close'].ffill()
-
+    signal = "STABLE"
+    if vix_spot > (vix_sma * 1.10):
+        signal = "SPIKING"
+    elif vix_spot < (vix_sma * 0.90):
+        signal = "CRUSHED"
+    
     return {
         'statusCode': 200,
         'body': {
-            "vix": {
-                "date": data['Close']['^VIX'].last_valid_index().date().isoformat(),
-                "price": closes['^VIX'].iloc[-1].item(),
-            },
-            "vix3m": {
-                "date": data['Close']['^VIX3M'].last_valid_index().date().isoformat(),
-                "price": closes['^VIX3M'].iloc[-1].item(),
-            },
-            "skew": {
-                "date": data['Close']['^SKEW'].last_valid_index().date().isoformat(),
-                "price": closes['^SKEW'].iloc[-1].item(),
-            },
+            'vix': {
+                'spot': vix_spot,
+                'sma': vix_sma,
+                'diff_pct': ((vix_spot - vix_sma) / vix_sma) * 100,
+                'signal': signal
+            }
         }
     }
+
+
+def get_history(ticker, window=20) -> tuple[float, float]:
+    data = yf.download(ticker, period="6mo", interval="1d", progress=False, auto_adjust=True)
+    spot = data['Close'].ffill().iloc[-1].item()
+    sma = data['Close'].rolling(window=window).mean().iloc[-1].item()
+    return spot, sma
