@@ -13,4 +13,4 @@ jobs:
     with:
       lambda_name: "vix-futures-staging"
       lambda_path: "vix-futures/staging"
-      
+    secrets: inherit
