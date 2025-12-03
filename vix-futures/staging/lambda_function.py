@@ -10,8 +10,17 @@ def lambda_handler(event, context):
     return {
         'statusCode': 200,
         'body': {
-            "vix": closes['^VIX'].iloc[-1].item(),
-            "vix3m": closes['^VIX3M'].iloc[-1].item(),
-            "skew": closes['^SKEW'].iloc[-1].item(),
+            "vix": {
+                "date": data['Close']['^VIX'].last_valid_index().date().isoformat(),
+                "price": closes['^VIX'].iloc[-1].item(),
+            },
+            "vix3m": {
+                "date": data['Close']['^VIX3M'].last_valid_index().date().isoformat(),
+                "price": closes['^VIX3M'].iloc[-1].item(),
+            },
+            "skew": {
+                "date": data['Close']['^SKEW'].last_valid_index().date().isoformat(),
+                "price": closes['^SKEW'].iloc[-1].item(),
+            },
         }
     }
