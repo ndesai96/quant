@@ -1,4 +1,4 @@
-name: Deploy to VIX Futures API
+name: Deploy to VIX Futures Lambdas
 
 on:
   push:
@@ -11,6 +11,6 @@ jobs:
   deploy:
     uses: ./.github/workflows/reusable-deploy-lambda.yml
     with:
-      lambda_name: "vix-futures-api"
+      lambda_functions: '["vix-futures-api","vix-futures-cboe"]'
       lambda_path: "vix-futures"
     secrets: inherit

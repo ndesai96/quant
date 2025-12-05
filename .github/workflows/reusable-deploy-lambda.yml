@@ -3,8 +3,8 @@ name: Reusable Deploy Lambda
 on:
   workflow_call:
     inputs:
-      lambda_name:
-        description: Lambda Name
+      lambda_functions:
+        description: List of Lambda Names
         required: true
         type: string
       lambda_path:
@@ -55,6 +55,9 @@ jobs:
           aws-region: ${{ inputs.region }}
       - name: Deploy Lambda Function
         run: |
-          aws lambda update-function-code \
-            --function-name ${{ inputs.lambda_name }} \
-            --zip-file fileb://${{ inputs.lambda_path }}/deployment_package.zip
+          echo '${{ inputs.lambda_functions }}' | jq -r '.[]' | while read function_name; do
+            echo "Deploying to $function_name"
+            aws lambda update-function-code \
+              --function-name "$function_name" \
+              --zip-file fileb://${{ inputs.lambda_path }}/deployment_package.zip
+          done
