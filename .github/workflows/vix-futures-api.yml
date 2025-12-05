@@ -1,16 +1,16 @@
-name: Deploy to VIX Futures Staging
+name: Deploy to VIX Futures API
 
 on:
   push:
     branches:
       - main
     paths:
-      - "vix-futures/staging/**"
+      - "vix-futures/**"
 
 jobs:
   deploy:
     uses: ./.github/workflows/reusable-deploy-lambda.yml
     with:
-      lambda_name: "vix-futures-staging"
-      lambda_path: "vix-futures/staging"
+      lambda_name: "vix-futures-api"
+      lambda_path: "vix-futures"
     secrets: inherit
