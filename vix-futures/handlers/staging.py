@@ -51,4 +51,3 @@ def get_history(ticker, window=20) -> tuple[float, float]:
 
 def get_spot(ticker) -> float:
     data = yf.download(ticker, period="5d", interval="1d", progress=False, auto_adjust=True)
-    return data['Close'].ffill().iloc[-1].item()
