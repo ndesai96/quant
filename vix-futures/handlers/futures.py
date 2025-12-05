@@ -3,6 +3,7 @@ import boto3
 from config import REGION, TABLE_NAME
 from boto3.dynamodb.conditions import Key
 import json
+from futures import get_historical_data
 
 # Run with:
 # poetry run python -m handlers.futures
@@ -38,23 +39,6 @@ def lambda_handler(event, context):
         'body': json.dumps(response_data)
     }
     
-def get_historical_data(start_date: datetime, end_date: datetime) -> list:
-    dynamodb = boto3.resource('dynamodb', region_name=REGION)
-    table = dynamodb.Table(TABLE_NAME)
-
-    response = table.query(
-        KeyConditionExpression=Key('product').eq('VX') & Key('date_symbol').between(
-            start_date.strftime('%Y-%m-%d'), 
-            end_date.strftime('%Y-%m-%d')
-        )
-    )
-
-    data = response['Items']
-    for item in data:
-        item['price'] = float(item['price'])
-    
-    return data
-
 if __name__ == '__main__':
     event = {
         'queryStringParameters': {
