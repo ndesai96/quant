@@ -42,11 +42,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry poetry-plugin-export
           poetry export -f requirements.txt --output requirements.txt
+          # Remove boto3 and botocore from requirements.txt as they are provided by Lambda
+          sed -i '/boto3/d' requirements.txt
+          sed -i '/botocore/d' requirements.txt
           pip install -t . -r requirements.txt
       - name: Create Deployment Package
         run: |
           cd ${{ inputs.lambda_path }}
-          zip -r deployment_package.zip . -x "*.pyc" -x "__pycache__/*" -x ".git/*" -x "*.zip"
+          zip -9 -r deployment_package.zip . -x "*.pyc" -x "__pycache__/*" -x ".git/*" -x "*.zip"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
