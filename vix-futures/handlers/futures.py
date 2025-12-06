@@ -3,7 +3,7 @@ import boto3
 from config import REGION, TABLE_NAME
 from boto3.dynamodb.conditions import Key
 import json
-from futures import get_historical_data
+from futures import get_historical_futures_data, get_realtime_futures_data
 
 # Run with:
 # poetry run python -m handlers.futures
@@ -31,7 +31,10 @@ def lambda_handler(event, context):
             }
     
     response_data = {
-        'historical': get_historical_data(start_date, end_date)
+        'futures': {
+            'historical': get_historical_futures_data(start_date, end_date),
+            'realtime': get_realtime_futures_data()
+        }
     }
 
     return {
@@ -40,10 +43,14 @@ def lambda_handler(event, context):
     }
     
 if __name__ == '__main__':
+    today = datetime.now()
+    start_date = today - timedelta(days=1)
+    end_date = today
+
     event = {
         'queryStringParameters': {
-            'start_date': '2025-11-01',
-            'end_date': '2025-11-04'
+            'start_date': start_date.strftime('%Y-%m-%d'),
+            'end_date': end_date.strftime('%Y-%m-%d')
         }
     }
     response = lambda_handler(event, None)
