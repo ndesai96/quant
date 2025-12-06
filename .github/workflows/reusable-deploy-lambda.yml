@@ -46,8 +46,7 @@ jobs:
 
           # Remove libraries already present in AWS Lambda runtime to save space
           rm -rf boto3* botocore* docutils* s3transfer* jmespath*
-          # Remove setup tools and cached dist-info
-          rm -rf pip* setuptools* wheel* *.dist-info
+          rm -rf pip* setuptools* wheel*
       - name: Create Deployment Package
         run: |
           cd ${{ inputs.lambda_path }}

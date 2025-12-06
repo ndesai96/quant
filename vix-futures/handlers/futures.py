@@ -32,7 +32,7 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'Invalid date format. Use YYYY-MM-DD.'})
             }
     
-    response_data = {
+    response = {
         'vix': get_vix_data(),
         'futures': {
             'historical': get_historical_futures_data(start_date, end_date),
@@ -42,7 +42,7 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': json.dumps(response_data)
+        'body': json.dumps(response)
     }
     
 if __name__ == '__main__':
