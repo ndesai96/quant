@@ -24,11 +24,21 @@ def lambda_handler(event, context):
             if start_date and end_date and end_date < start_date:
                 return {
                     'statusCode': 400,
+                    'headers': {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type',
+                        'Access-Control-Allow-Methods': 'OPTIONS,GET'
+                    },
                     'body': json.dumps('Error: end_date cannot be before start_date')
                 }
         except ValueError:
             return {
                 'statusCode': 400,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Methods': 'OPTIONS,GET'
+                },
                 'body': json.dumps({'error': 'Invalid date format. Use YYYY-MM-DD.'})
             }
     
