@@ -4,6 +4,7 @@ from config import REGION, TABLE_NAME
 from boto3.dynamodb.conditions import Key
 import json
 from futures import get_historical_futures_data, get_realtime_futures_data
+from vix import get_vix_data
 
 # Run with:
 # poetry run python -m handlers.futures
@@ -31,6 +32,7 @@ def lambda_handler(event, context):
             }
     
     response_data = {
+        'vix': get_vix_data(),
         'futures': {
             'historical': get_historical_futures_data(start_date, end_date),
             'realtime': get_realtime_futures_data()
