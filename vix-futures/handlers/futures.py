@@ -44,7 +44,7 @@ def lambda_handler(event, context):
     
 if __name__ == '__main__':
     today = datetime.now()
-    start_date = today - timedelta(days=1)
+    start_date = today - timedelta(days=3)
     end_date = today
 
     event = {
