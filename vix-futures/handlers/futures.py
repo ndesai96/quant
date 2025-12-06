@@ -12,8 +12,9 @@ from vix import get_vix_data
 def lambda_handler(event, context):
     query_params = event.get('queryStringParameters')
 
-    start_date = datetime.now() - timedelta(days=30)
-    end_date = datetime.now()
+    today = datetime.now()
+    start_date = today - timedelta(days=30)
+    end_date = today
 
     if query_params:
         try:
