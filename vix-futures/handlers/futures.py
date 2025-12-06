@@ -10,18 +10,35 @@ from vix import get_vix_data
 # poetry run python -m handlers.futures
 
 def lambda_handler(event, context):
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'OPTIONS,GET'
+    }
+
     query_params = event.get('queryStringParameters')
 
     today = datetime.now()
     start_date = today - timedelta(days=30)
     end_date = today
 
-    if query_params:
-        try:
-            start_date = datetime.strptime(query_params.get('start_date'), '%Y-%m-%d')
-            end_date = datetime.strptime(query_params.get('end_date'), '%Y-%m-%d')
+    try:
+        if query_params:
+            try:
+                start_date = datetime.strptime(query_params.get('start_date'), '%Y-%m-%d')
+                end_date = datetime.strptime(query_params.get('end_date'), '%Y-%m-%d')
 
-            if start_date and end_date and end_date < start_date:
+                if start_date and end_date and end_date < start_date:
+                    return {
+                        'statusCode': 400,
+                        'headers': {
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Headers': 'Content-Type',
+                            'Access-Control-Allow-Methods': 'OPTIONS,GET'
+                        },
+                        'body': json.dumps('Error: end_date cannot be before start_date')
+                    }
+            except ValueError:
                 return {
                     'statusCode': 400,
                     'headers': {
@@ -29,36 +46,36 @@ def lambda_handler(event, context):
                         'Access-Control-Allow-Headers': 'Content-Type',
                         'Access-Control-Allow-Methods': 'OPTIONS,GET'
                     },
-                    'body': json.dumps('Error: end_date cannot be before start_date')
+                    'body': json.dumps({'error': 'Invalid date format. Use YYYY-MM-DD.'})
                 }
-        except ValueError:
-            return {
-                'statusCode': 400,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                    'Access-Control-Allow-Methods': 'OPTIONS,GET'
-                },
-                'body': json.dumps({'error': 'Invalid date format. Use YYYY-MM-DD.'})
+        
+        response = {
+            'vix': get_vix_data(),
+            'futures': {
+                'historical': get_historical_futures_data(start_date, end_date),
+                'realtime': get_realtime_futures_data()
             }
-    
-    response = {
-        'vix': get_vix_data(),
-        'futures': {
-            'historical': get_historical_futures_data(start_date, end_date),
-            'realtime': get_realtime_futures_data()
         }
-    }
 
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Allow-Methods': 'OPTIONS,GET'
-        },
-        'body': json.dumps(response)
-    }
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'OPTIONS,GET'
+            },
+            'body': json.dumps(response)
+        }
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({
+                'error': 'Internal Server Error',
+                'details': str(e)
+            })
+        }
     
 if __name__ == '__main__':
     today = datetime.now()
