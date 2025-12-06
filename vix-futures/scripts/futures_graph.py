@@ -3,6 +3,7 @@ import pandas as pd
 import json
 from datetime import datetime, timedelta
 from futures import get_historical_futures_data, get_realtime_futures_data
+from vix import get_vix_data
 
 # Run with:
 # poetry run python -m scripts.futures_graph
@@ -11,6 +12,12 @@ def plot(data: dict):
     symbols = {item['symbol'] for item in data['realtime']}
 
     plt.figure(figsize=(12, 7))
+
+    plt.axhline(y=data['spot'],
+                linestyle='--',
+                alpha=0.7,
+                label='Spot',
+                color='red')
 
     historical_data = data['historical']
     sorted_dates = sorted(historical_data.keys())
@@ -61,6 +68,7 @@ if __name__ == "__main__":
 
     data = {
         'historical': get_historical_futures_data(start_date, end_date),
-        'realtime': get_realtime_futures_data()
+        'realtime': get_realtime_futures_data(),
+        'spot': get_vix_data()['spot']
     }
     plot(data)
