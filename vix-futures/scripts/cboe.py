@@ -8,8 +8,8 @@ import argparse
 from cboe import get_cboe_data, write_to_dynamodb
 
 # Run with:
-# poetry run python -m backfills.cboe --dry-run
-# poetry run python -m backfills.cboe
+# poetry run python -m scripts.cboe --dry-run
+# poetry run python -m scripts.cboe
 
 def backfill(start_date: datetime, end_date: datetime, dry_run: bool = False):
     date = start_date
