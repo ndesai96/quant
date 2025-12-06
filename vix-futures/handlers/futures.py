@@ -55,5 +55,4 @@ if __name__ == '__main__':
             'end_date': end_date.strftime('%Y-%m-%d')
         }
     }
-    response = lambda_handler(event, None)
-    print(response)
+    print(lambda_handler(event, None))
